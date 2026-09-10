@@ -226,3 +226,5 @@ button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focu
 :host-context(.resuloto-native) .topbar { height: 51px; padding-top: 0; }
 :host-context(.resuloto-native) .page { padding-top: 14px; padding-bottom: calc(100px + var(--native-ad-height)); }
 :host-context(.resuloto-native) .bottom-nav { bottom: 100px; }
+:host-context(.resuloto-native) .topbar { height: calc(51px + env(safe-area-inset-top)); padding-top: env(safe-area-inset-top); }
+:host-context(.resuloto-native) .bottom-nav { height: 64px; padding: 4px 8px 0; background: #fff; box-shadow: 0 -8px 22px rgba(42,47,79,.12); }
