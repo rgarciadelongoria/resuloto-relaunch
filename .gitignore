@@ -1,0 +1,10 @@
+.DS_Store
+/.angular/
+/dist/
+/node_modules/
+/public/
+/platform/.angular/
+/platform/dist/
+/platform/node_modules/
+/platform/android/
+/platform/ios/
