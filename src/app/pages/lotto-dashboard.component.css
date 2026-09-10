@@ -199,6 +199,25 @@ button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focu
   aspect-ratio: 1 / 1;
   border-radius: 50% !important;
 }
+.ball.ball-long, .featured-balls span.ball-long, .history-balls span.ball-long {
+  width: auto !important;
+  min-width: 0 !important;
+  height: 42px !important;
+  min-height: 42px !important;
+  padding: 0 13px !important;
+  border-radius: 12px !important;
+  font-size: 16px !important;
+  letter-spacing: .2px;
+}
+@media (max-width: 619px) {
+  .ball.ball-long, .featured-balls span.ball-long, .history-balls span.ball-long {
+    height: 40px !important;
+    min-height: 40px !important;
+    padding: 0 11px !important;
+    border-radius: 11px !important;
+    font-size: 15px !important;
+  }
+}
 :host(.scanner-host-hidden) { visibility: hidden !important; pointer-events: none !important; }
 :host(.scanner-host-hidden) .scanner-overlay { visibility: visible; pointer-events: auto; }
 :host-context(.plt-mobile) { --native-ad-height: 72px; }
