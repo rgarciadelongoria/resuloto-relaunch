@@ -376,12 +376,15 @@ export class LottoDashboardComponent implements OnInit {
     this.historyLoading = true;
     this.changeDetector.markForCheck();
     try {
-      const page = await this.api.loadGameHistory(this.config, this.selectedGame, this.historyOffset, this.historyPageSize);
+      const tail = this.history[this.history.length - 1];
+      const page = tail?.previousDate
+        ? await this.api.loadDrawByDate(this.config, this.selectedGame, tail.previousDate)
+        : await this.api.loadGameHistory(this.config, this.selectedGame, this.historyOffset, this.historyPageSize);
       const known = new Set(this.history.map(draw => draw.id));
       const fresh = page.filter(draw => !known.has(draw.id));
       this.history = [...this.history, ...fresh];
       this.historyOffset += page.length;
-      this.historyHasMore = page.length >= this.historyPageSize && fresh.length > 0;
+      this.historyHasMore = fresh.length > 0 && Boolean(page[page.length - 1]?.previousDate || page.length >= this.historyPageSize);
     } catch (error) {
       this.error = this.errorMessage(error, 'No hemos podido cargar más sorteos.');
       this.historyHasMore = false;

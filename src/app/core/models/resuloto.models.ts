@@ -71,6 +71,8 @@ export interface LotteryDraw {
   tables: DrawDataTable[];
   videoUrl?: string;
   detailUrl?: string;
+  previousDate?: string;
+  nextDate?: string;
 }
 
 export interface DrawDataTable {

@@ -40,6 +40,14 @@ export class ResulotoApiService {
     return this.parseDraws(await this.getText(url.toString()));
   }
 
+  /** Carga un único sorteo siguiendo la cadena fechaanterior/fechasiguiente. */
+  async loadDrawByDate(config: AppConfig, game: LotteryGame, date: string): Promise<LotteryDraw[]> {
+    const url = new URL(`${config.carpetaXML}${game.urlXML}`, this.rootUrl);
+    url.searchParams.set('premios', 'S');
+    url.searchParams.set('fecha', date);
+    return this.parseDraws(await this.getText(url.toString()));
+  }
+
   async loadGameHistory(config: AppConfig, game: LotteryGame, offset = 0, limit?: number): Promise<LotteryDraw[]> {
     const url = new URL(`${config.carpetaXML}${game.urlXML}`, this.rootUrl);
     // La lista rápida usa la respuesta resumida; la ficha de juego necesita el
@@ -172,7 +180,9 @@ export class ResulotoApiService {
         prizes,
         tables,
         videoUrl: this.text(draw, 'urlvideo') || undefined,
-        detailUrl: this.text(draw, 'urldetalle') || undefined
+        detailUrl: this.text(draw, 'urldetalle') || undefined,
+        previousDate: this.text(draw, 'fechaanterior') || undefined,
+        nextDate: this.text(draw, 'fechasiguiente') || undefined
       };
     }).filter(draw => Boolean(draw.game));
   }
