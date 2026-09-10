@@ -28,6 +28,17 @@ export class ShellBridgeService {
     document.body.style.margin = '0';
     document.body.style.padding = '0';
     document.body.style.width = '100%';
+    document.body.style.overflowX = 'hidden';
+    const shellRoot = document.querySelector<HTMLElement>('app-root');
+    shellRoot?.style.setProperty('display', 'block');
+    shellRoot?.style.setProperty('width', '100%');
+    shellRoot?.style.setProperty('min-width', '0');
+    shellRoot?.style.setProperty('margin', '0');
+    shellRoot?.style.setProperty('padding', '0');
+    const remoteRoot = document.querySelector<HTMLElement>('rl-root');
+    remoteRoot?.style.setProperty('display', 'block');
+    remoteRoot?.style.setProperty('width', '100%');
+    remoteRoot?.style.setProperty('max-width', '100%');
     this.dispatch('shellStatusbarSetStyle', { style: 'DARK' });
     this.dispatch('shellStatusbarSetBackgroundColor', { color: '#0b162e' });
   }
