@@ -261,8 +261,9 @@ export class LottoDashboardComponent implements OnInit {
       ]);
       this.history = history;
       this.historyOffset = history.length;
-      this.historyHasMore = history.length > 0
-        && Boolean(history[history.length - 1]?.previousDate || history.length >= this.historyPageSize);
+      // El backend no comunica el total. Mientras haya resultados, dejamos
+      // abierta una petición adicional para descubrir si existe otro sorteo.
+      this.historyHasMore = history.length > 0;
       this.gameExperience = gameExperience;
       this.focusedDraw = this.history[0];
     } catch (error) {
@@ -381,7 +382,7 @@ export class LottoDashboardComponent implements OnInit {
   }
 
   async loadMoreHistory(): Promise<void> {
-    if (!this.config || !this.selectedGame || this.historyLoading || !this.historyHasMore) return;
+    if (!this.config || !this.selectedGame || this.historyLoading) return;
     this.historyLoading = true;
     this.changeDetector.markForCheck();
     try {
@@ -407,7 +408,7 @@ export class LottoDashboardComponent implements OnInit {
   canGoToNewer(): boolean { return this.drawIndex() > 0; }
   canGoToOlder(): boolean {
     const index = this.drawIndex();
-    return index >= 0 && (index < this.history.length - 1 || this.historyHasMore);
+    return index >= 0 && (index < this.history.length - 1 || this.historyHasMore || !this.historyLoading);
   }
   goToNewerDraw(): void {
     const index = this.drawIndex();
@@ -416,7 +417,7 @@ export class LottoDashboardComponent implements OnInit {
   goToOlderDraw(): void {
     const index = this.drawIndex();
     if (index >= 0 && index < this.history.length - 1) this.selectDraw(this.history[index + 1]);
-    else if (this.historyHasMore) void this.loadMoreHistory();
+    else if (!this.historyLoading) void this.loadMoreHistory();
   }
 
   @HostListener('window:scroll')
