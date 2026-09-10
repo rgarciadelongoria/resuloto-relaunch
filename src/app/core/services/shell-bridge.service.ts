@@ -5,6 +5,7 @@ import { AdvertisingConfig } from '../models/resuloto.models';
 @Injectable({ providedIn: 'root' })
 export class ShellBridgeService {
   private requestSequence = 0;
+  private scannerCancel?: HTMLButtonElement;
 
   get platform(): string {
     try {
@@ -47,7 +48,17 @@ export class ShellBridgeService {
     document.documentElement.classList.add('barcode-scanner-active');
     document.documentElement.style.background = 'transparent';
     document.body.style.background = 'transparent';
-    document.querySelector('rl-root')?.classList.add('scanner-host-hidden');
+    const root = document.querySelector<HTMLElement>('rl-root');
+    root?.classList.add('scanner-host-hidden');
+    root?.style.setProperty('visibility', 'hidden', 'important');
+    root?.style.setProperty('pointer-events', 'none', 'important');
+    this.scannerCancel = document.createElement('button');
+    this.scannerCancel.type = 'button';
+    this.scannerCancel.textContent = 'Cancelar';
+    this.scannerCancel.setAttribute('aria-label', 'Cerrar cámara');
+    Object.assign(this.scannerCancel.style, { position: 'fixed', bottom: 'calc(24px + env(safe-area-inset-bottom))', right: '20px', zIndex: '2147483647', padding: '12px 18px', border: '1px solid rgba(255,255,255,.6)', borderRadius: '12px', background: 'rgba(15,20,35,.86)', color: '#fff', font: '700 14px -apple-system, sans-serif' });
+    this.scannerCancel.addEventListener('click', () => void this.stopScan(), { once: true });
+    document.body.appendChild(this.scannerCancel);
     const response = await this.request<unknown>('shellScannerStart', {}, 'shellScannerError', 45_000);
     const scanned = response as Record<string, unknown>;
     const code = [scanned?.['rawValue'], scanned?.['displayValue'], scanned?.['text'], scanned?.['value']]
@@ -62,7 +73,12 @@ export class ShellBridgeService {
     document.documentElement.classList.remove('barcode-scanner-active');
     document.documentElement.style.removeProperty('background');
     document.body.style.removeProperty('background');
-    document.querySelector('rl-root')?.classList.remove('scanner-host-hidden');
+    const root = document.querySelector<HTMLElement>('rl-root');
+    root?.classList.remove('scanner-host-hidden');
+    root?.style.removeProperty('visibility');
+    root?.style.removeProperty('pointer-events');
+    this.scannerCancel?.remove();
+    this.scannerCancel = undefined;
     if (!this.isNative) return;
     try { await this.request('shellScannerStop', {}, undefined, 5_000); } catch { /* ya estaba cerrado */ }
   }
