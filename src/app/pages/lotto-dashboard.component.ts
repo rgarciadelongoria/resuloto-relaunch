@@ -261,7 +261,8 @@ export class LottoDashboardComponent implements OnInit {
       ]);
       this.history = history;
       this.historyOffset = history.length;
-      this.historyHasMore = history.length >= this.historyPageSize;
+      this.historyHasMore = history.length > 0
+        && Boolean(history[history.length - 1]?.previousDate || history.length >= this.historyPageSize);
       this.gameExperience = gameExperience;
       this.focusedDraw = this.history[0];
     } catch (error) {
