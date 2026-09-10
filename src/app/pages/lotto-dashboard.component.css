@@ -133,6 +133,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focu
 .video-slot { display: inline-flex; width: 60px; min-width: 60px; justify-content: flex-start; }
 .video-slot:not(.has-video) { visibility: hidden; }
 .draw-navigation-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 7px 14px; border-bottom: 1px solid #edf0f5; background: color-mix(in srgb,var(--game-color) 4%,#fff); }
+.draw-navigation-row { background: transparent; }
 .draw-navigation-row button { display: grid; width: 34px; height: 30px; place-items: center; border: 1px solid #e6e9f0; border-radius: 8px; background: #fff; color: var(--game-color); font-size: 19px; font-weight: 800; cursor: pointer; }
 .draw-navigation-row button:disabled { color: #c4cad5; cursor: not-allowed; }
 .draw-navigation-row span { color: #7a8498; font-size: 9px; font-weight: 800; }
