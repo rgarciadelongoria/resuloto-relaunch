@@ -172,7 +172,6 @@
             </div>
             <div class="draw-navigation-row" role="group" aria-label="Navegar por sorteos">
               <button type="button" (click)="goToOlderDraw()" [disabled]="!canGoToOlder()" aria-label="Sorteo anterior">←</button>
-              <span>{{ drawIndex() + 1 }} / {{ historyHasMore ? '…' : history.length }}</span>
               <button type="button" (click)="goToNewerDraw()" [disabled]="!canGoToNewer()" aria-label="Sorteo siguiente">→</button>
             </div>
             @if (focusedDraw.videoUrl || focusedDraw.detailUrl) {
