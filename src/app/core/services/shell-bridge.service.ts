@@ -43,18 +43,20 @@ export class ShellBridgeService {
       throw new Error('El escáner está disponible desde la aplicación móvil.');
     }
 
-    const response = await this.request<unknown>(
-      'shellScannerStart',
-      {},
-      'shellScannerError',
-      45_000
-    );
+    document.body.classList.add('barcode-scanner-active');
+    const response = await this.request<unknown>('shellScannerStart', {}, 'shellScannerError', 45_000);
     const scanned = response as Record<string, unknown>;
     const code = [scanned?.['rawValue'], scanned?.['displayValue'], scanned?.['text'], scanned?.['value']]
       .find((value): value is string => typeof value === 'string' && value.length > 0);
 
     if (!code) throw new Error('No se ha podido leer el código. Inténtalo de nuevo o usa el comprobador manual.');
     return code;
+  }
+
+  async stopScan(): Promise<void> {
+    document.body.classList.remove('barcode-scanner-active');
+    if (!this.isNative) return;
+    try { await this.request('shellScannerStop', {}, undefined, 5_000); } catch { /* ya estaba cerrado */ }
   }
 
   async openExternal(url: string): Promise<void> {

@@ -142,6 +142,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focu
 .history-sentinel { height: 1px; }
 /* Reserva el espacio del banner AdMob nativo cuando la shell está en WebView. */
 :host-context(.plt-capacitor), :host-context(.capacitor) { --native-ad-height: 56px; }
+:host-context(body.barcode-scanner-active) .app-shell { visibility: hidden; pointer-events: none; }
 .page { padding-bottom: calc(108px + var(--native-ad-height, 0px)); }
 .bottom-nav { bottom: var(--native-ad-height, 0px); }
 @keyframes spin { to { transform: rotate(360deg); } }

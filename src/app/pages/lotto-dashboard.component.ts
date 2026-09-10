@@ -326,6 +326,7 @@ export class LottoDashboardComponent implements OnInit {
     } catch (error) {
       this.error = this.errorMessage(error, 'No se ha podido leer el código. Prueba de nuevo o usa el comprobador manual.');
     } finally {
+      await this.shell.stopScan();
       this.scanning = false;
       this.changeDetector.markForCheck();
     }
