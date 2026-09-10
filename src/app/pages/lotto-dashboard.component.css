@@ -138,6 +138,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focu
 .draw-navigation-row, .detail-links { background: linear-gradient(100deg, color-mix(in srgb, var(--game-color) 11%, #fff), #fff 65%); }
 .draw-navigation-row { padding-top: 0; padding-bottom: 9px; }
 .detail-links { border-bottom: 1px solid #edf0f5; padding-top: 0; }
+.draw-navigation-row, .detail-links { border: 0 !important; }
 .draw-navigation-row button { display: grid; width: 34px; height: 30px; place-items: center; border: 1px solid #e6e9f0; border-radius: 8px; background: #fff; color: var(--game-color); font-size: 19px; font-weight: 800; cursor: pointer; }
 .draw-navigation-row button:disabled { color: #c4cad5; cursor: not-allowed; }
 .draw-navigation-row span { color: #7a8498; font-size: 9px; font-weight: 800; }
