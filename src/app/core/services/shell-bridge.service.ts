@@ -16,12 +16,19 @@ export class ShellBridgeService {
   }
 
   get isNative(): boolean {
-    return this.platform === 'android' || this.platform === 'ios';
+    // La shell establece las clases de Ionic antes de que el remote pueda
+    // leer su configuración persistida. Usarlas como respaldo evita que el
+    // MF se renderice con el layout web dentro del WebView nativo.
+    return this.platform === 'android' || this.platform === 'ios'
+      || document.body.classList.contains('plt-capacitor')
+      || document.body.classList.contains('capacitor')
+      || document.body.classList.contains('plt-mobile');
   }
 
   applyChrome(): void {
     if (!this.isNative) return;
     document.documentElement.classList.add('resuloto-native');
+    document.body.classList.add('resuloto-native');
     document.documentElement.style.margin = '0';
     document.documentElement.style.padding = '0';
     document.documentElement.style.width = '100%';

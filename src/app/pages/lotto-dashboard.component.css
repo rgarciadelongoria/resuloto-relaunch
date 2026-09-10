@@ -228,3 +228,78 @@ button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focu
 :host-context(.resuloto-native) .bottom-nav { bottom: 100px; }
 :host-context(.resuloto-native) .topbar { height: calc(51px + env(safe-area-inset-top)); padding-top: env(safe-area-inset-top); }
 :host-context(.resuloto-native) .bottom-nav { height: 64px; padding: 4px 8px 0; background: #fff; box-shadow: 0 -8px 22px rgba(42,47,79,.12); }
+
+/* Contrato visual del remote dentro de resuloto-shell (iOS/Capacitor). */
+:host-context(.plt-mobile), :host-context(.resuloto-native) {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow-x: hidden !important;
+  box-sizing: border-box;
+}
+:host-context(.plt-mobile) .app-shell, :host-context(.resuloto-native) .app-shell {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  overflow-x: hidden !important;
+}
+:host-context(.plt-mobile) .topbar, :host-context(.resuloto-native) .topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  /* El inset se reserva una sola vez, dejando el contenido debajo de la isla. */
+  height: calc(51px + env(safe-area-inset-top));
+  padding: env(safe-area-inset-top) 16px 0;
+}
+:host-context(.plt-mobile) .page, :host-context(.resuloto-native) .page {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  box-sizing: border-box;
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+  padding-top: 14px !important;
+  padding-bottom: calc(64px + 100px + env(safe-area-inset-bottom)) !important;
+}
+:host-context(.plt-mobile) .bottom-nav, :host-context(.resuloto-native) .bottom-nav {
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 100px !important;
+  width: 100% !important;
+  max-width: none !important;
+  height: 64px !important;
+  margin: 0 !important;
+  padding: 4px 8px 0 !important;
+  box-sizing: border-box;
+  border-left: 0 !important;
+  border-right: 0 !important;
+  border-radius: 0 !important;
+  background: #fff !important;
+}
+
+/* Los resultados de 5 cifras son pastillas legibles; el resto siempre es círculo. */
+:host-context(.plt-mobile) .ball:not(.ball-long),
+:host-context(.resuloto-native) .ball:not(.ball-long),
+:host-context(.plt-mobile) .featured-balls span:not(.ball-long),
+:host-context(.resuloto-native) .featured-balls span:not(.ball-long),
+:host-context(.plt-mobile) .history-balls span:not(.ball-long),
+:host-context(.resuloto-native) .history-balls span:not(.ball-long) {
+  width: 34px !important;
+  min-width: 34px !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  flex: 0 0 34px !important;
+  padding: 0 !important;
+  aspect-ratio: 1 / 1 !important;
+  border-radius: 50% !important;
+}
