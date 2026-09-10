@@ -332,6 +332,12 @@ export class LottoDashboardComponent implements OnInit {
     }
   }
 
+  async cancelScan(): Promise<void> {
+    await this.shell.stopScan();
+    this.scanning = false;
+    this.changeDetector.markForCheck();
+  }
+
   async openExternalChecker(): Promise<void> {
     if (!this.checkerGame) return;
     const url = this.api.externalCheckerUrl(this.checkerGame, this.manual.date);

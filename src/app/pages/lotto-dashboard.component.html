@@ -325,4 +325,7 @@
   @if (loading) {
     <div class="loading-layer" role="status"><span class="loader"></span><p>{{ loadingLabel }}</p></div>
   }
+  @if (scanning) {
+    <div class="scanner-overlay" role="status"><span>Apunta al código del boleto</span><button type="button" (click)="cancelScan()">Cancelar</button></div>
+  }
 </main>

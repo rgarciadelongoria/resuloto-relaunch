@@ -142,7 +142,10 @@ button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focu
 .history-sentinel { height: 1px; }
 /* Reserva el espacio del banner AdMob nativo cuando la shell está en WebView. */
 :host-context(.plt-capacitor), :host-context(.capacitor) { --native-ad-height: 56px; }
-:host-context(body.barcode-scanner-active) .app-shell { visibility: hidden; pointer-events: none; }
+:host-context(body.barcode-scanner-active) .app-shell > *:not(.scanner-overlay) { visibility: hidden; pointer-events: none; }
+:host-context(body.barcode-scanner-active), :host-context(body.barcode-scanner-active) .app-shell { background: transparent !important; }
+.scanner-overlay { position: fixed; z-index: 100; inset: 0; display: flex; align-items: flex-end; justify-content: space-between; padding: 24px max(20px, env(safe-area-inset-left)) calc(24px + env(safe-area-inset-bottom)); background: linear-gradient(transparent 65%, rgba(0,0,0,.58)); color: #fff; font-size: 13px; font-weight: 700; pointer-events: none; }
+.scanner-overlay button { pointer-events: auto; padding: 10px 16px; border: 1px solid rgba(255,255,255,.55); border-radius: 10px; background: rgba(20,25,43,.78); color: #fff; font-weight: 800; }
 .page { padding-bottom: calc(108px + var(--native-ad-height, 0px)); }
 .bottom-nav { bottom: var(--native-ad-height, 0px); }
 @keyframes spin { to { transform: rotate(360deg); } }
