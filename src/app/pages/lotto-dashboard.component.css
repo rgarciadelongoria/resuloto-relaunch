@@ -287,6 +287,33 @@ button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focu
   background: #fff !important;
 }
 
+/* La shell desplaza el documento completo, por lo que sticky no siempre
+   encuentra el scroll-container correcto. En nativo el header se ancla al
+   viewport y el contenido reserva exactamente su altura. */
+:host-context(.plt-mobile) .app-shell,
+:host-context(.resuloto-native) .app-shell {
+  padding-top: calc(51px + env(safe-area-inset-top)) !important;
+}
+:host-context(.plt-mobile) .topbar,
+:host-context(.resuloto-native) .topbar {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: calc(51px + env(safe-area-inset-top)) !important;
+  padding: env(safe-area-inset-top) 16px 0 !important;
+  transform: translateZ(0);
+}
+:host-context(.plt-mobile) .page,
+:host-context(.resuloto-native) .page {
+  position: relative;
+  left: 0 !important;
+  right: auto !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: clip;
+}
+
 /* Los resultados de 5 cifras son pastillas legibles; el resto siempre es círculo. */
 :host-context(.plt-mobile) .ball:not(.ball-long),
 :host-context(.resuloto-native) .ball:not(.ball-long),
