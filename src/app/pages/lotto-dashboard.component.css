@@ -121,3 +121,11 @@ button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focu
 @media (min-width: 900px) {
   .page { padding-top: 38px; }.draw-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }.game-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }.history-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }.ticket-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }.game-strip { grid-template-columns: repeat(4, 1fr); }.bottom-nav { left: 50%; right: auto; width: 550px; transform: translateX(-50%); }
 }
+
+/* Color semántico por sorteo: el acento identifica el juego sin teñir toda la tarjeta. */
+.history-card { border-top: 3px solid color-mix(in srgb, var(--game-color) 76%, #fff); }
+.history-card .result-tag { background: color-mix(in srgb, var(--game-color) 13%, #fff); color: color-mix(in srgb, var(--game-color) 85%, #33405a); }
+.history-card .history-balls span { background: color-mix(in srgb, var(--game-color) 14%, #fff); color: color-mix(in srgb, var(--game-color) 82%, #33405a); }
+.history-card .history-balls span:nth-child(6n + 1) { background: var(--game-color); color: #fff; }
+.history-card .watch-button { border-color: color-mix(in srgb, var(--game-color) 25%, #e6e1fb); color: color-mix(in srgb, var(--game-color) 82%, #3f356d); }
+.history-card.latest { border-color: color-mix(in srgb, var(--game-color) 44%, #e5e9f1); box-shadow: 0 10px 23px color-mix(in srgb, var(--game-color) 13%, transparent); }

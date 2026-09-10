@@ -101,11 +101,13 @@ export class LottoDashboardComponent implements OnInit {
   };
 
   private readonly spanishGameColors: Record<string, string> = {
-    'Lotería Nacional': '#d62839', Bonoloto: '#69a92f', 'La Primitiva': '#16834a',
-    EuroMillones: '#1261a0', EuroDreams: '#009b9a', 'El Gordo de la Primitiva': '#e59b23',
-    'La Quiniela': '#1769aa', 'Cupón Diario': '#1674c8', Cuponazo: '#d62f77',
-    'Sueldazo Fin de Semana': '#7548a8', 'Super 11': '#d9343a', 'Triplex de la ONCE': '#ef8126',
-    'Mi Día': '#7351b6', EuroJackPot: '#d94232'
+    // Colores extraídos de los SVG oficiales incluidos en resuloto-app.
+    'Lotería Nacional': '#000b8c', Bonoloto: '#768828', 'La Primitiva': '#008547',
+    EuroMillones: '#21267b', EuroDreams: '#e50056', 'El Gordo de la Primitiva': '#dc3f47',
+    'La Quiniela': '#cb1517', 'Cupón Diario': '#007ac0', Cuponazo: '#e50056',
+    'Sueldazo Fin de Semana': '#6e368c', 'Super 11': '#e30613', 'Super Once': '#e30613',
+    'Triplex de la ONCE': '#f28c28', 'Mi Día': '#6e368c', 'Mi día de la ONCE': '#6e368c',
+    EuroJackPot: '#e30613', Eurojackpot: '#e30613'
   };
 
   constructor(

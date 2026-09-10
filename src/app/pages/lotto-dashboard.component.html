@@ -246,7 +246,7 @@
         }
         <section class="history-list">
           @for (draw of history; track draw.id; let first = $first) {
-            <article class="history-card" [class.latest]="first" [class.selected]="isFocusedDraw(draw)" (click)="selectDraw(draw)" tabindex="0" (keydown.enter)="selectDraw(draw)">
+            <article class="history-card" [style.--game-color]="cardAccent(gameForDraw(draw))" [class.latest]="first" [class.selected]="isFocusedDraw(draw)" (click)="selectDraw(draw)" tabindex="0" (keydown.enter)="selectDraw(draw)">
               <div class="history-top"><div><span class="result-tag">{{ first ? 'ÚLTIMO SORTEO' : 'SORTEO' }}</span><h3>{{ draw.displayDate }}</h3></div><span class="result-date">{{ draw.date }}</span></div>
               <div class="history-balls">@for (ball of drawBalls(draw); track $index) { <span [class.ball-long]="isLongBall(ball)">{{ ball }}</span> }</div>
               @if (drawExtras(draw).length) { <div class="history-extras">@for (extra of drawExtras(draw); track extra.label) { <span><b>{{ extra.label }}</b>{{ extra.value }}</span> }</div> }
