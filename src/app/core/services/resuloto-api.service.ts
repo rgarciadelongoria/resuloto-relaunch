@@ -17,7 +17,9 @@ import {
  * Adaptador de la API pública existente. No interpreta la configuración HTML/XML
  * que la aplicación antigua ejecutaba: sólo transforma datos en modelos seguros.
  */
-@Injectable({ providedIn: 'root' })
+// Se proporciona junto con HttpClient en el árbol de rutas del MF. La shell no
+// registra HttpClient en su inyector raíz.
+@Injectable()
 export class ResulotoApiService {
   private readonly rootUrl = 'https://www.resuloto.com/';
   private readonly appUrl = 'https://www.resuloto.com/v1.0.7/';
