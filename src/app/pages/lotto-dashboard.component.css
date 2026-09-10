@@ -175,6 +175,14 @@ button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focu
   .prize-table-wrap { max-width: 100%; }
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* Ajustes del contenedor cuando el remote vive dentro de resuloto-shell. */
+:host { display: block; width: 100%; max-width: 100%; min-height: 0; margin: 0; padding: 0; border: 0; }
+:host-context(.plt-mobile) { --native-ad-height: 100px; }
+:host-context(.plt-mobile) .topbar { height: 51px; padding: 0 16px; }
+:host-context(.plt-mobile) .app-shell { width: 100%; min-height: 100%; margin: 0; border: 0; border-radius: 0; }
+:host-context(.plt-mobile) .page { width: 100%; max-width: none; min-height: 0; padding-top: 14px; padding-bottom: calc(100px + var(--native-ad-height)); }
+:host-context(.plt-mobile) .bottom-nav { bottom: var(--native-ad-height); }
 :host(.scanner-host-hidden) { visibility: hidden !important; pointer-events: none !important; }
 :host(.scanner-host-hidden) .scanner-overlay { visibility: visible; pointer-events: auto; }
 :host-context(.plt-mobile) { --native-ad-height: 72px; }
