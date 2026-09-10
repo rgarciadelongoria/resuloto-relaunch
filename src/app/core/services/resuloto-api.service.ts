@@ -44,11 +44,15 @@ export class ResulotoApiService {
     return this.parseDraws(await this.getText(url.toString()));
   }
 
-  async loadGameHistory(config: AppConfig, game: LotteryGame): Promise<LotteryDraw[]> {
+  async loadGameHistory(config: AppConfig, game: LotteryGame, offset = 0, limit?: number): Promise<LotteryDraw[]> {
     const url = new URL(`${config.carpetaXML}${game.urlXML}`, this.rootUrl);
     // La lista rápida usa la respuesta resumida; la ficha de juego necesita el
     // desglose de categorías que la API sólo entrega con premios=S.
     url.searchParams.set('premios', 'S');
+    if (limit && limit > 0) {
+      url.searchParams.set('ini', String(offset));
+      url.searchParams.set('fin', String(offset + limit - 1));
+    }
     return this.parseDraws(await this.getText(url.toString()));
   }
 

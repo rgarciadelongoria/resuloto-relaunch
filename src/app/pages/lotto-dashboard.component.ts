@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
@@ -45,6 +45,8 @@ export class LottoDashboardComponent implements OnInit {
   catalog?: CountryCatalog;
   draws: LotteryDraw[] = [];
   history: LotteryDraw[] = [];
+  historyLoading = false;
+  historyHasMore = true;
   selectedGame?: LotteryGame;
   focusedDraw?: LotteryDraw;
   gameExperience: GameExperience = { media: [], tables: [] };
@@ -62,6 +64,8 @@ export class LottoDashboardComponent implements OnInit {
   countryMenuOpen = false;
   checkerResult?: CheckResult;
   readonly manual: ManualCheckRequest = { number: '', series: '', date: this.isoDate() };
+  private historyOffset = 0;
+  private readonly historyPageSize = 12;
 
   private readonly flags: Record<string, string> = {
     AR: '🇦🇷', CL: '🇨🇱', CO: '🇨🇴', CR: '🇨🇷', EC: '🇪🇨', ES: '🇪🇸',
@@ -235,6 +239,9 @@ export class LottoDashboardComponent implements OnInit {
     if (!this.config) return;
     this.selectedGame = game;
     this.history = [];
+    this.historyOffset = 0;
+    this.historyHasMore = true;
+    this.historyLoading = false;
     this.focusedDraw = undefined;
     this.gameExperience = { media: [], tables: [] };
     this.videoOpenId = undefined;
@@ -246,12 +253,14 @@ export class LottoDashboardComponent implements OnInit {
     this.shell.track('open_game', { game_name: game.nombre, organizer: game.organismo });
     try {
       const [history, gameExperience] = await Promise.all([
-        this.api.loadGameHistory(this.config, game),
+        this.api.loadGameHistory(this.config, game, 0, this.historyPageSize),
         this.country
           ? this.api.loadGameExperience(this.country.key, game).catch(() => ({ media: [], tables: [] }))
           : Promise.resolve({ media: [], tables: [] })
       ]);
       this.history = history;
+      this.historyOffset = history.length;
+      this.historyHasMore = history.length >= this.historyPageSize;
       this.gameExperience = gameExperience;
       this.focusedDraw = this.history[0];
     } catch (error) {
@@ -360,6 +369,49 @@ export class LottoDashboardComponent implements OnInit {
     this.videoOpenId = undefined;
     this.shell.vibrate(12);
     this.changeDetector.markForCheck();
+  }
+
+  async loadMoreHistory(): Promise<void> {
+    if (!this.config || !this.selectedGame || this.historyLoading || !this.historyHasMore) return;
+    this.historyLoading = true;
+    this.changeDetector.markForCheck();
+    try {
+      const page = await this.api.loadGameHistory(this.config, this.selectedGame, this.historyOffset, this.historyPageSize);
+      const known = new Set(this.history.map(draw => draw.id));
+      const fresh = page.filter(draw => !known.has(draw.id));
+      this.history = [...this.history, ...fresh];
+      this.historyOffset += page.length;
+      this.historyHasMore = page.length >= this.historyPageSize && fresh.length > 0;
+    } catch (error) {
+      this.error = this.errorMessage(error, 'No hemos podido cargar más sorteos.');
+      this.historyHasMore = false;
+    } finally {
+      this.historyLoading = false;
+      this.changeDetector.markForCheck();
+    }
+  }
+
+  drawIndex(draw = this.focusedDraw): number { return draw ? this.history.findIndex(item => item.id === draw.id) : -1; }
+  canGoToNewer(): boolean { return this.drawIndex() > 0; }
+  canGoToOlder(): boolean {
+    const index = this.drawIndex();
+    return index >= 0 && (index < this.history.length - 1 || this.historyHasMore);
+  }
+  goToNewerDraw(): void {
+    const index = this.drawIndex();
+    if (index > 0) this.selectDraw(this.history[index - 1]);
+  }
+  goToOlderDraw(): void {
+    const index = this.drawIndex();
+    if (index >= 0 && index < this.history.length - 1) this.selectDraw(this.history[index + 1]);
+    else if (this.historyHasMore) void this.loadMoreHistory();
+  }
+
+  @HostListener('window:scroll')
+  onWindowScroll(): void {
+    if (this.view !== 'detail' || this.historyLoading || !this.historyHasMore) return;
+    const remaining = document.documentElement.scrollHeight - (window.scrollY + window.innerHeight);
+    if (remaining < 720) void this.loadMoreHistory();
   }
 
   toggleFavorite(game: LotteryGame, event?: Event): void {

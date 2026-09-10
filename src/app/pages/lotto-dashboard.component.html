@@ -170,6 +170,11 @@
             <div class="draw-detail-header">
               <div><span class="result-tag">FICHA DEL SORTEO</span><h2>{{ focusedDraw.displayDate }}</h2><p>{{ selectedGame.nombre }} · {{ focusedDraw.date }}</p></div>
               <div class="detail-header-actions">
+                <div class="draw-navigation" role="group" aria-label="Navegar por sorteos">
+                  <button type="button" (click)="goToNewerDraw()" [disabled]="!canGoToNewer()" aria-label="Sorteo siguiente">←</button>
+                  <span>{{ drawIndex() + 1 }} / {{ history.length }}{{ historyHasMore ? '+' : '' }}</span>
+                  <button type="button" (click)="goToOlderDraw()" [disabled]="!canGoToOlder()" aria-label="Sorteo anterior">→</button>
+                </div>
                 @if (focusedDraw.videoUrl) { <button class="watch-button" type="button" (click)="openVideo(focusedDraw)"><span>▶</span> Vídeo</button> }
                 @if (focusedDraw.detailUrl) { <button class="source-button" type="button" (click)="openSource(focusedDraw)">Fuente ↗</button> }
               </div>
@@ -254,6 +259,8 @@
             </article>
           }
         </section>
+        @if (historyLoading) { <div class="history-loading" role="status"><span class="loading-dot"></span> Cargando más sorteos…</div> }
+        @if (!historyLoading && historyHasMore) { <div class="history-sentinel" aria-hidden="true"></div> }
       }
     }
 
