@@ -1,0 +1,319 @@
+<main class="app-shell" [class.is-loading]="loading">
+  <header class="topbar">
+    <button class="brand" type="button" (click)="setView('home')" aria-label="Ir al inicio">
+      <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span>resu<span>loto</span></span>
+    </button>
+
+    <div class="top-actions">
+      @if (country) {
+        <div class="country-select">
+          <button class="country-button" type="button" (click)="countryMenuOpen = !countryMenuOpen" [attr.aria-expanded]="countryMenuOpen">
+            <span class="country-flag">{{ country.flag }}</span>
+            <span class="country-label">{{ country.label }}</span>
+            <span class="chevron" aria-hidden="true">⌄</span>
+          </button>
+          @if (countryMenuOpen) {
+            <div class="country-menu" role="menu" aria-label="Elegir país">
+              <span class="menu-eyebrow">Resultados de</span>
+              @for (item of countries; track item.key) {
+                <button type="button" role="menuitem" [class.selected]="item.key === country.key" (click)="selectCountry(item)">
+                  <span>{{ item.flag }}</span><span>{{ item.label }}</span>
+                  @if (item.key === country.key) { <b aria-label="Seleccionado">✓</b> }
+                </button>
+              }
+            </div>
+          }
+        </div>
+      }
+      <button class="icon-button refresh" type="button" (click)="refresh()" [disabled]="loading" aria-label="Actualizar resultados">↻</button>
+    </div>
+  </header>
+
+  @if (error) {
+    <aside class="notice" role="alert">
+      <span class="notice-icon">!</span>
+      <p>{{ error }}</p>
+      <button type="button" (click)="closeNotice()" aria-label="Cerrar aviso">×</button>
+    </aside>
+  }
+
+  <section class="page" [class.page-detail]="view === 'detail'">
+    @if (view === 'home') {
+      <section class="hero">
+        <div class="hero-copy">
+          <span class="eyebrow"><i></i> RESULTADOS AL DÍA</span>
+          <h1>La suerte,<br><em>bien informada.</em></h1>
+          <p>Todos tus sorteos, claros y en un solo lugar.</p>
+          <div class="hero-actions">
+            <button type="button" class="primary-button" (click)="openChecker()">
+              <span class="button-icon">⌁</span> Comprobar boleto
+            </button>
+            <button type="button" class="text-button" (click)="setView('games')">Explorar juegos <span>→</span></button>
+          </div>
+        </div>
+        <div class="hero-orb" aria-hidden="true">
+          <span class="orb-ball one">07</span>
+          <span class="orb-ball two">21</span>
+          <span class="orb-ball three">★</span>
+          <span class="orbit"></span>
+        </div>
+      </section>
+
+      <section class="quick-check">
+        <button type="button" class="scan-tile" (click)="openChecker()">
+          <span class="scan-icon"><i></i><i></i><i></i><i></i></span>
+          <span><strong>¿Tienes un boleto?</strong><small>Escanéalo o compruébalo a mano</small></span>
+          <b>→</b>
+        </button>
+      </section>
+
+      <section class="section-heading results-heading">
+        <div>
+          <span class="eyebrow subtle">ÚLTIMA ACTUALIZACIÓN</span>
+          <h2>Últimos resultados</h2>
+        </div>
+        <button class="see-all" type="button" (click)="setView('games')">Ver juegos <span>→</span></button>
+      </section>
+
+      @if (!loading && !draws.length) {
+        <section class="empty-state compact"><span>◌</span><h3>Aún no hay resultados para mostrar</h3><p>Vuelve a intentarlo dentro de unos minutos.</p></section>
+      }
+      <section class="draw-grid" aria-label="Últimos resultados">
+        @for (draw of draws.slice(0, 6); track draw.id) {
+          <article class="draw-card" [style.--accent]="cardAccent(gameForDraw(draw))" (click)="gameForDraw(draw) && openGame(gameForDraw(draw)!)" tabindex="0" (keydown.enter)="gameForDraw(draw) && openGame(gameForDraw(draw)!)">
+            <div class="draw-card-top">
+              <span class="game-emblem">
+                @if (gameForDraw(draw); as game) {
+                  @if (gameLogoUrl(game); as logo) { <img [src]="logo" [alt]="game.nombre"> } @else { {{ gameSymbol(draw.game) }} }
+                } @else { {{ gameSymbol(draw.game) }} }
+              </span>
+              <div><span class="draw-game">{{ draw.game }}</span><span class="draw-org">{{ drawGameLabel(draw) }}</span></div>
+              <time>{{ draw.displayDate }}</time>
+            </div>
+            <div class="draw-numbers">
+              @for (ball of drawBalls(draw); track $index) { <span class="ball" [class.ball-long]="isLongBall(ball)">{{ ball }}</span> }
+            </div>
+            @if (drawExtras(draw).length) {
+              <div class="draw-extras">
+                @for (extra of drawExtras(draw); track extra.label) { <span><b>{{ extra.label }}</b> {{ extra.value }}</span> }
+              </div>
+            }
+            <span class="card-arrow">→</span>
+          </article>
+        }
+      </section>
+
+      <section class="section-heading games-heading">
+        <div><span class="eyebrow subtle">ELIGE TU JUEGO</span><h2>Juegos destacados</h2></div>
+        <button class="see-all" type="button" (click)="setView('games')">Ver todos <span>→</span></button>
+      </section>
+      <section class="game-strip" aria-label="Juegos destacados">
+        @for (game of featuredGames; track game.nombre) {
+          <button type="button" class="game-chip" [style.--game-color]="cardAccent(game)" (click)="openGame(game)">
+            <span class="chip-symbol">@if (gameLogoUrl(game); as logo) { <img [src]="logo" [alt]="game.nombre"> } @else { {{ gameSymbol(game.nombre) }} }</span>
+            <span>{{ game.nombre }}</span>
+            <small>{{ game.organismo }}</small>
+          </button>
+        }
+      </section>
+    }
+
+    @if (view === 'games') {
+      <section class="view-header">
+        <span class="eyebrow"><i></i> TODOS LOS SORTEOS</span>
+        <h1>Encuentra tu juego</h1>
+        <p>Resultados actualizados de {{ country?.label }}.</p>
+      </section>
+      <label class="search-box"><span>⌕</span><input [(ngModel)]="search" name="game-search" type="search" placeholder="Busca un juego, organismo…"><button type="button" *ngIf="search" (click)="search = ''" aria-label="Limpiar búsqueda">×</button></label>
+      <div class="filter-row" aria-label="Organismos disponibles">
+        @for (organism of organizations; track organism) { <span>{{ organism }}</span> }
+      </div>
+      @if (!games.length) {
+        <section class="empty-state"><span>⌕</span><h3>No hemos encontrado ese juego</h3><p>Prueba con otro nombre.</p></section>
+      }
+      <section class="game-list">
+        @for (game of games; track game.nombre) {
+          <article class="game-row" [style.--game-color]="cardAccent(game)" (click)="openGame(game)">
+            <span class="game-row-symbol">@if (gameLogoUrl(game); as logo) { <img [src]="logo" [alt]="game.nombre"> } @else { {{ gameSymbol(game.nombre) }} }</span>
+            <div class="game-row-copy"><strong>{{ game.nombre }}</strong><span>{{ game.organismo }} · {{ game.dias ? 'Sorteos regulares' : 'Consulta resultados' }}</span></div>
+            <button type="button" class="favorite-button" [class.is-favorite]="isFavorite(game)" (click)="toggleFavorite(game, $event)" [attr.aria-label]="isFavorite(game) ? 'Quitar de favoritos' : 'Añadir a favoritos'">♥</button>
+            <span class="row-arrow">→</span>
+          </article>
+        }
+      </section>
+    }
+
+    @if (view === 'detail') {
+      <button class="back-button" type="button" (click)="setView('games')"><span>←</span> Todos los juegos</button>
+      @if (selectedGame) {
+        <section class="game-hero" [style.--game-color]="cardAccent(selectedGame)">
+          <span class="game-hero-symbol">
+            @if (gameLogoUrl(selectedGame, true); as logo) {
+              <img [src]="logo" [alt]="selectedGame.nombre + ' · ' + selectedGame.organismo">
+            } @else {
+              {{ gameSymbol(selectedGame.nombre) }}
+            }
+          </span>
+          <div><span class="eyebrow">{{ selectedGame.organismo }}</span><h1>{{ selectedGame.nombre }}</h1><p>Consulta los sorteos y comprueba tu participación.</p></div>
+          <button type="button" class="favorite-button large" [class.is-favorite]="isFavorite(selectedGame)" (click)="toggleFavorite(selectedGame)" aria-label="Gestionar favorito">♥</button>
+        </section>
+        <section class="detail-actions">
+          <button type="button" class="primary-button" (click)="openChecker(selectedGame)"><span class="button-icon">⌁</span> Comprobar boleto</button>
+          <span>{{ drawSchedule(selectedGame) }}</span>
+        </section>
+        @if (!loading && !history.length) {
+          <section class="empty-state"><span>◌</span><h3>No hay sorteos para este juego</h3><p>La fuente todavía no ha publicado resultados.</p></section>
+        }
+        @if (focusedDraw) {
+          <section class="draw-detail" [style.--game-color]="cardAccent(selectedGame)">
+            <div class="draw-detail-header">
+              <div><span class="result-tag">FICHA DEL SORTEO</span><h2>{{ focusedDraw.displayDate }}</h2><p>{{ selectedGame.nombre }} · {{ focusedDraw.date }}</p></div>
+              <div class="detail-header-actions">
+                @if (focusedDraw.videoUrl) { <button class="watch-button" type="button" (click)="openVideo(focusedDraw)"><span>▶</span> Vídeo</button> }
+                @if (focusedDraw.detailUrl) { <button class="source-button" type="button" (click)="openSource(focusedDraw)">Fuente ↗</button> }
+              </div>
+            </div>
+            <div class="draw-detail-grid" [class.has-stats]="drawStatistics(focusedDraw).length > 0">
+              <article class="winning-numbers">
+                <span class="detail-label">NÚMEROS PREMIADOS</span>
+                <div class="featured-balls">@for (ball of drawBalls(focusedDraw, 20); track $index) { <span [class.ball-long]="isLongBall(ball)">{{ ball }}</span> }</div>
+                @if (drawExtras(focusedDraw).length) { <div class="detail-extras">@for (extra of drawExtras(focusedDraw); track extra.label) { <span><b>{{ extra.label }}</b>{{ extra.value }}</span> }</div> }
+              </article>
+              @if (drawStatistics(focusedDraw).length) {
+                <article class="draw-stats"><span class="detail-label">DATOS DEL SORTEO</span><div>
+                  @for (stat of drawStatistics(focusedDraw); track stat.label) { <span><b>{{ stat.value }}</b><small>{{ stat.label }}</small></span> }
+                </div></article>
+              }
+            </div>
+            @if (gameNarrative(focusedDraw); as narrative) {
+              <article class="game-narrative"><span class="detail-label">INFORMACIÓN DEL JUEGO</span><p>{{ narrative }}</p></article>
+            }
+            @if (isVideoOpen(focusedDraw)) {
+              @if (videoEmbedUrl(focusedDraw); as videoUrl) {
+                <section class="video-player" aria-label="Vídeo del sorteo">
+                  <iframe [src]="videoUrl" [title]="'Vídeo del sorteo de ' + selectedGame.nombre" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </section>
+              }
+            }
+            @if (mediaForDraw(focusedDraw).length) {
+              <section class="ticket-gallery">
+                <div class="gallery-heading"><div><span class="detail-label">DOCUMENTACIÓN GRÁFICA</span><h3>Billete o cupón premiado</h3></div><span>Fuente oficial</span></div>
+                <div class="ticket-list">
+                  @for (media of mediaForDraw(focusedDraw); track media.src) {
+                    <figure class="ticket-card">
+                      @if (isMediaUnavailable(media.src)) {
+                        <div class="media-unavailable"><span>▧</span><strong>Imagen oficial no disponible</strong><small>La fuente no ha publicado el cupón para este sorteo.</small></div>
+                      } @else if (media.link) {
+                        <button type="button" class="ticket-link" (click)="openMediaLink(media.link)" [attr.aria-label]="'Abrir fuente oficial: ' + (media.caption || 'billete premiado')">
+                          <img [src]="media.src" [alt]="media.caption || 'Billete o cupón premiado'" loading="lazy" (error)="markMediaUnavailable(media.src)">
+                          <span>Ver en la fuente ↗</span>
+                        </button>
+                      } @else {
+                        <img [src]="media.src" [alt]="media.caption || 'Billete o cupón premiado'" loading="lazy" (error)="markMediaUnavailable(media.src)">
+                      }
+                      @if (media.caption) { <figcaption>{{ media.caption }}</figcaption> }
+                    </figure>
+                  }
+                </div>
+              </section>
+            }
+            @if (focusedDraw.prizes.length) {
+              <article class="prize-panel"><div class="prize-panel-heading"><div><span class="detail-label">PREMIOS</span><h3>Premios por categoría</h3></div><span>{{ focusedDraw.prizes.length }} categorías</span></div>
+                <div class="prize-table-wrap"><table><thead><tr><th>Categoría</th><th>Premio</th><th>Acertantes</th></tr></thead><tbody>
+                  @for (prize of focusedDraw.prizes; track $index) { <tr><td>{{ prize.category }}</td><td>{{ prize.amount }}</td><td>{{ prize.winners || '—' }}@if (prize.secondaryWinners) { <small> / {{ prize.secondaryWinners }} Europa</small> }</td></tr> }
+                </tbody></table></div>
+              </article>
+            } @else {
+              <p class="prize-pending">El organizador no ha publicado el desglose de premios de este sorteo.</p>
+            }
+            @if (detailTables(focusedDraw).length) {
+              <section class="supplemental-tables">
+                @for (table of detailTables(focusedDraw); track table.title) {
+                  <article class="generic-table-panel">
+                    <div class="prize-panel-heading"><div><span class="detail-label">DETALLE DEL SORTEO</span><h3>{{ table.title }}</h3></div><span>{{ table.rows.length }} registros</span></div>
+                    <div class="prize-table-wrap"><table><thead><tr>
+                      @for (column of table.columns; track column.key) { <th>{{ column.label }}</th> }
+                    </tr></thead><tbody>
+                      @for (row of table.rows; track $index) { <tr>@for (column of table.columns; track column.key) { <td>{{ row[column.key] || '—' }}</td> }</tr> }
+                    </tbody></table></div>
+                  </article>
+                }
+              </section>
+            }
+          </section>
+          <div class="history-heading"><span class="detail-label">HISTÓRICO</span><h2>Elige otro sorteo</h2></div>
+        }
+        <section class="history-list">
+          @for (draw of history; track draw.id; let first = $first) {
+            <article class="history-card" [class.latest]="first" [class.selected]="isFocusedDraw(draw)" (click)="selectDraw(draw)" tabindex="0" (keydown.enter)="selectDraw(draw)">
+              <div class="history-top"><div><span class="result-tag">{{ first ? 'ÚLTIMO SORTEO' : 'SORTEO' }}</span><h3>{{ draw.displayDate }}</h3></div><span class="result-date">{{ draw.date }}</span></div>
+              <div class="history-balls">@for (ball of drawBalls(draw); track $index) { <span [class.ball-long]="isLongBall(ball)">{{ ball }}</span> }</div>
+              @if (drawExtras(draw).length) { <div class="history-extras">@for (extra of drawExtras(draw); track extra.label) { <span><b>{{ extra.label }}</b>{{ extra.value }}</span> }</div> }
+              @if (draw.videoUrl) { <button class="watch-button" type="button" (click)="openVideo(draw)"><span>▶</span> Ver vídeo del sorteo</button> }
+            </article>
+          }
+        </section>
+      }
+    }
+
+    @if (view === 'checker') {
+      <button class="back-button" type="button" (click)="setView('home')"><span>←</span> Inicio</button>
+      <section class="checker-intro">
+        <span class="eyebrow"><i></i> COMPROBADOR</span>
+        <h1>¿Ha tocado?</h1>
+        <p>Escanea el código de tu boleto o introduce los datos a mano.</p>
+      </section>
+      <section class="scan-panel">
+        <div class="scanner-visual" aria-hidden="true"><span></span><i></i><i></i><i></i><i></i><b></b></div>
+        <div><span class="scan-kicker">MÁS RÁPIDO</span><h2>Comprueba con la cámara</h2><p>Usamos el escáner nativo y seguro de la aplicación.</p>
+          <button type="button" class="scan-button" [disabled]="scanning" (click)="scanTicket()">{{ scanning ? 'Abriendo cámara…' : 'Escanear boleto' }} <span>⌁</span></button>
+        </div>
+      </section>
+      <div class="or-divider"><span>o introdúcelo manualmente</span></div>
+      <section class="manual-panel">
+        <label class="field-label">Juego
+          <select [(ngModel)]="checkerGame" name="checker-game" (ngModelChange)="onCheckerGameChanged()">
+            @for (game of games; track game.nombre) { <option [ngValue]="game">{{ game.nombre }} · {{ game.organismo }}</option> }
+          </select>
+        </label>
+        <div class="form-grid">
+          <label class="field-label">Número<input [(ngModel)]="manual.number" name="ticket-number" inputmode="numeric" [attr.maxlength]="isOnceChecker ? 5 : 5" placeholder="00000"></label>
+          @if (isOnceChecker) { <label class="field-label">Serie<input [(ngModel)]="manual.series" name="ticket-series" inputmode="numeric" maxlength="3" placeholder="000"></label> }
+          <label class="field-label">Fecha del sorteo<input [(ngModel)]="manual.date" name="ticket-date" type="date"></label>
+        </div>
+        @if (checkerGame && !checkerGame.urlComprobador) { <p class="manual-note">Este juego se comprobará comparando sus resultados. Para algunos sorteos puedes abrir su comprobador especializado.</p> }
+        <button type="button" class="primary-button full" [disabled]="checking" (click)="checkTicket()">{{ checking ? 'Comprobando…' : 'Comprobar ahora' }} <span>→</span></button>
+      </section>
+      @if (checkerResult) {
+        <section class="checker-result" [class.external]="checkerResult.needsExternalChecker">
+          <span class="result-icon">{{ checkerResult.needsExternalChecker ? '↗' : '✓' }}</span>
+          <div><span class="result-eyebrow">{{ checkerResult.source === 'scanner' ? 'CÓDIGO LEÍDO' : 'RESULTADO DEL COMPROBADOR' }}</span><h2>{{ checkerResult.needsExternalChecker ? 'Consulta especializada' : 'Comprobación completada' }}</h2><p>{{ checkerResult.message }}</p></div>
+          @if (checkerResult.needsExternalChecker && api.externalCheckerUrl(checkerGame!, manual.date)) { <button type="button" class="outline-button" (click)="openExternalChecker()">Abrir comprobador <span>↗</span></button> }
+        </section>
+      }
+    }
+
+    @if (view === 'favorites') {
+      <section class="view-header favorites-header"><span class="eyebrow"><i></i> TU LISTA</span><h1>Favoritos</h1><p>Ten siempre a mano los juegos que más consultas.</p></section>
+      @if (!favoriteGames.length) {
+        <section class="empty-state"><span>♥</span><h3>Aún no tienes favoritos</h3><p>Guarda los juegos que quieras seguir desde el catálogo.</p><button class="outline-button" type="button" (click)="setView('games')">Explorar juegos</button></section>
+      } @else {
+        <section class="game-list">@for (game of favoriteGames; track game.nombre) {
+          <article class="game-row" [style.--game-color]="cardAccent(game)" (click)="openGame(game)"><span class="game-row-symbol">@if (gameLogoUrl(game); as logo) { <img [src]="logo" [alt]="game.nombre"> } @else { {{ gameSymbol(game.nombre) }} }</span><div class="game-row-copy"><strong>{{ game.nombre }}</strong><span>{{ game.organismo }}</span></div><button type="button" class="favorite-button is-favorite" (click)="toggleFavorite(game, $event)" aria-label="Quitar de favoritos">♥</button><span class="row-arrow">→</span></article>
+        }</section>
+      }
+    }
+  </section>
+
+  <nav class="bottom-nav" aria-label="Navegación principal">
+    <button type="button" [class.active]="view === 'home'" (click)="setView('home')"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V10Z"/></svg><span>Inicio</span></button>
+    <button type="button" [class.active]="view === 'games' || view === 'detail'" (click)="setView('games')"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Juegos</span></button>
+    <button type="button" class="nav-check" [class.active]="view === 'checker'" (click)="openChecker()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V5h4M20 9V5h-4M4 15v4h4M20 15v4h-4M8 12h8"/><path d="M10 9.5h4v5h-4z"/></svg><b>Comprobar</b></button>
+    <button type="button" [class.active]="view === 'favorites'" (click)="setView('favorites')"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 8.2c0 5.4-8.8 11.1-8.8 11.1S3.2 13.6 3.2 8.2A4.2 4.2 0 0 1 11 6a4.2 4.2 0 0 1 7.8 2.2Z"/></svg><span>Favoritos</span></button>
+  </nav>
+
+  @if (loading) {
+    <div class="loading-layer" role="status"><span class="loader"></span><p>{{ loadingLabel }}</p></div>
+  }
+</main>
