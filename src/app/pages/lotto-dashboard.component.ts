@@ -100,6 +100,14 @@ export class LottoDashboardComponent implements OnInit {
     }
   };
 
+  private readonly spanishGameColors: Record<string, string> = {
+    'Lotería Nacional': '#d62839', Bonoloto: '#69a92f', 'La Primitiva': '#16834a',
+    EuroMillones: '#1261a0', EuroDreams: '#009b9a', 'El Gordo de la Primitiva': '#e59b23',
+    'La Quiniela': '#1769aa', 'Cupón Diario': '#1674c8', Cuponazo: '#d62f77',
+    'Sueldazo Fin de Semana': '#7548a8', 'Super 11': '#d9343a', 'Triplex de la ONCE': '#ef8126',
+    'Mi Día': '#7351b6', EuroJackPot: '#d94232'
+  };
+
   constructor(
     readonly shell: ShellBridgeService,
     readonly api: ResulotoApiService,
@@ -109,6 +117,9 @@ export class LottoDashboardComponent implements OnInit {
   ) {}
 
   async ngOnInit(): Promise<void> {
+    // Contrato de arranque con resuloto-shell: la shell muestra su pantalla de
+    // error si el remote no marca explícitamente que ha montado correctamente.
+    this.markShellRemoteReady();
     this.shell.applyChrome();
     try {
       this.config = await this.api.loadConfig();
@@ -131,6 +142,16 @@ export class LottoDashboardComponent implements OnInit {
     } finally {
       this.loading = false;
       this.changeDetector.markForCheck();
+    }
+  }
+
+  private markShellRemoteReady(): void {
+    try {
+      localStorage.setItem('shellLoadingRemoteOk', 'true');
+      document.getElementById('screenBeforeLoadingRemote')?.remove();
+    } catch {
+      // El almacenamiento puede estar restringido en algún WebView; no debe
+      // impedir el renderizado del microfrontal.
     }
   }
 
@@ -567,7 +588,8 @@ export class LottoDashboardComponent implements OnInit {
   }
 
   cardAccent(game?: LotteryGame): string {
-    return game?.color ?? '#7455ed';
+    if (!game) return '#7455ed';
+    return this.country?.code === 'ES' ? (this.spanishGameColors[game.nombre] ?? game.color ?? '#7455ed') : (game.color ?? '#7455ed');
   }
 
   isGameSelected(game: LotteryGame): boolean {
