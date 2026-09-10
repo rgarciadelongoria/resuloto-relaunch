@@ -90,6 +90,16 @@ export class LottoDashboardComponent implements OnInit {
     'Sorteo 11 del 11': 'once_once'
   };
 
+  private readonly countryLogoNames: Record<string, Record<string, string>> = {
+    ES: this.spanishLogoNames,
+    MX: {
+      Melate: 'melate', 'Melate Retro': 'melate_retro', Chispazo: 'chispazo', Tris: 'tris',
+      'Gana Gato': 'gana_gato', Progol: 'progol', 'Progol Media Semana': 'progol_media_semana',
+      'Sorteo Mayor': 'sorteo_mayor', 'Sorteo Superior': 'sorteo_superior', 'Sorteo Zodiaco': 'sorteo_zodiaco',
+      'Sorteo Especial': 'sorteo_especial', 'Sorteo Magno': 'sorteo_magno', 'Sorteo de Diez': 'sorteo_de_diez'
+    }
+  };
+
   constructor(
     readonly shell: ShellBridgeService,
     readonly api: ResulotoApiService,
@@ -359,15 +369,33 @@ export class LottoDashboardComponent implements OnInit {
 
   drawBalls(draw: LotteryDraw, limit = 8): string[] {
     const { result } = draw;
+    if (this.normalize(draw.game).includes('mi dia')) return [];
     if (result['signos']) return result['signos'].replace(/\s+/g, '').split('').slice(0, limit);
-    if (result['numeros']) return result['numeros'].split(/\s+/).filter(Boolean).slice(0, limit);
+    if (result['numeros']) return this.numericTokens(result['numeros']).slice(0, limit);
+    const primaryGroup = Object.entries(result).find(([key, value]) => value && /^numeros[a-z]+$/i.test(key));
+    if (primaryGroup) return this.numericTokens(primaryGroup[1]).slice(0, limit);
+    const grouped = Object.entries(result)
+      .filter(([key, value]) => value && /^(numeros|numero)[a-z]+$/i.test(key))
+      .flatMap(([, value]) => this.numericTokens(value));
+    if (grouped.length) return grouped.slice(0, limit);
     const numbered = Object.keys(result)
       .filter(key => /^numero\d+$/.test(key) && result[key])
       .sort((a, b) => Number(a.replace('numero', '')) - Number(b.replace('numero', '')))
       .map(key => result[key]);
     if (numbered.length) return numbered.slice(0, limit);
     if (result['numero']) return [result['numero']];
-    return Object.values(result).filter(Boolean).slice(0, limit);
+    return Object.values(result).flatMap(value => this.numericTokens(value)).slice(0, limit);
+  }
+
+  private numericTokens(value: string): string[] {
+    const text = String(value).trim();
+    if (!text || this.isDateLike(text)) return [];
+    const tokens = text.split(/\s+/).filter(token => /^\d{1,5}$/.test(token));
+    return tokens.length ? tokens : (/^\d{1,5}$/.test(text) ? [text] : []);
+  }
+
+  private isDateLike(value: string): boolean {
+    return /^\d{1,4}[\/-][A-Za-z0-9]+[\/-]\d{2,4}$/.test(value);
   }
 
   isLongBall(value: string): boolean {
@@ -392,6 +420,16 @@ export class LottoDashboardComponent implements OnInit {
       .sort()
       .map(key => draw.result[key]);
     if (reintegros.length) extras.push({ label: 'Reintegros', value: reintegros.join(' · ') });
+    [['numerosrevancha', 'Revancha'], ['numerosrevanchita', 'Revanchita']].forEach(([key, label]) => {
+      const value = draw.result[key];
+      if (value) extras.push({ label: `Números ${label}`, value: this.numericTokens(value).join(' · ') });
+    });
+    if (this.normalize(draw.game).includes('mi dia')) {
+      const date = [draw.result['dia'], draw.result['mes'], draw.result['anno']].every(Boolean)
+        ? `${draw.result['dia']}/${draw.result['mes']}/${draw.result['anno']}`
+        : draw.result['fecha'] ?? draw.result['fechajuego'] ?? draw.metadata['fechajuego'];
+      if (date && !extras.some(extra => extra.label === 'Fecha premiada')) extras.push({ label: 'Fecha premiada', value: date });
+    }
     return extras;
   }
 
@@ -506,8 +544,8 @@ export class LottoDashboardComponent implements OnInit {
   }
 
   gameLogoUrl(game: LotteryGame, title = false): string | undefined {
-    const localName = this.country?.code === 'ES' ? this.spanishLogoNames[game.nombre] : undefined;
-    if (localName) return `assets/logos/games/es/${localName}${title ? '-title' : ''}.svg`;
+    const localName = this.countryLogoNames[this.country?.code ?? '']?.[game.nombre];
+    if (localName) return `assets/logos/games/${(this.country?.code ?? 'ES').toLowerCase()}/${localName}${title ? '-title' : ''}.svg`;
     return this.gameIconUrl(game);
   }
 
