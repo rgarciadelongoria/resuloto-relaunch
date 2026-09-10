@@ -175,3 +175,6 @@ button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focu
   .prize-table-wrap { max-width: 100%; }
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+:host(.scanner-host-hidden) { visibility: hidden !important; pointer-events: none !important; }
+:host(.scanner-host-hidden) .scanner-overlay { visibility: visible; pointer-events: auto; }
+:host-context(.plt-mobile) { --native-ad-height: 72px; }
