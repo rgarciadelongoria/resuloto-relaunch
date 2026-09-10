@@ -22,6 +22,12 @@ export class ShellBridgeService {
   applyChrome(): void {
     if (!this.isNative) return;
     document.documentElement.classList.add('resuloto-native');
+    document.documentElement.style.margin = '0';
+    document.documentElement.style.padding = '0';
+    document.documentElement.style.width = '100%';
+    document.body.style.margin = '0';
+    document.body.style.padding = '0';
+    document.body.style.width = '100%';
     this.dispatch('shellStatusbarSetStyle', { style: 'DARK' });
     this.dispatch('shellStatusbarSetBackgroundColor', { color: '#0b162e' });
   }
