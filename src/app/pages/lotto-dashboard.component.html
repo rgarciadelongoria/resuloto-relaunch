@@ -170,12 +170,14 @@
             <div class="draw-detail-header">
               <div><span class="result-tag">FICHA DEL SORTEO</span><h2>{{ focusedDraw.displayDate }}</h2><p>{{ selectedGame.nombre }} · {{ focusedDraw.date }}</p></div>
               <div class="detail-header-actions">
-                <div class="draw-navigation" role="group" aria-label="Navegar por sorteos">
-                  <button type="button" (click)="goToNewerDraw()" [disabled]="!canGoToNewer()" aria-label="Sorteo siguiente">←</button>
-                  <span>{{ drawIndex() + 1 }} / {{ history.length }}{{ historyHasMore ? '+' : '' }}</span>
-                  <button type="button" (click)="goToOlderDraw()" [disabled]="!canGoToOlder()" aria-label="Sorteo anterior">→</button>
+                <div class="video-slot" [class.has-video]="focusedDraw.videoUrl">
+                  @if (focusedDraw.videoUrl) { <button class="watch-button" type="button" (click)="openVideo(focusedDraw)"><span>▶</span> Vídeo</button> }
                 </div>
-                @if (focusedDraw.videoUrl) { <button class="watch-button" type="button" (click)="openVideo(focusedDraw)"><span>▶</span> Vídeo</button> }
+                <div class="draw-navigation" role="group" aria-label="Navegar por sorteos">
+                  <button type="button" (click)="goToOlderDraw()" [disabled]="!canGoToOlder()" aria-label="Sorteo anterior">←</button>
+                  <span>{{ drawIndex() + 1 }} / {{ history.length }}{{ historyHasMore ? '+' : '' }}</span>
+                  <button type="button" (click)="goToNewerDraw()" [disabled]="!canGoToNewer()" aria-label="Sorteo siguiente">→</button>
+                </div>
                 @if (focusedDraw.detailUrl) { <button class="source-button" type="button" (click)="openSource(focusedDraw)">Fuente ↗</button> }
               </div>
             </div>

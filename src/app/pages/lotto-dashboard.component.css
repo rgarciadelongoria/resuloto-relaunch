@@ -129,6 +129,8 @@ button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focu
 .history-card .history-balls span:nth-child(6n + 1) { background: var(--game-color); color: #fff; }
 .history-card .watch-button { border-color: color-mix(in srgb, var(--game-color) 25%, #e6e1fb); color: color-mix(in srgb, var(--game-color) 82%, #3f356d); }
 .history-card.latest { border-color: color-mix(in srgb, var(--game-color) 44%, #e5e9f1); box-shadow: 0 10px 23px color-mix(in srgb, var(--game-color) 13%, transparent); }
+.video-slot { display: inline-flex; width: 60px; min-width: 60px; justify-content: flex-start; }
+.video-slot:not(.has-video) { visibility: hidden; }
 .draw-navigation { display: inline-flex; align-items: center; gap: 5px; margin-right: 4px; padding: 3px; border: 1px solid #e6e9f0; border-radius: 10px; background: rgba(255,255,255,.8); }
 .draw-navigation button { display: grid; width: 27px; height: 27px; place-items: center; border: 0; border-radius: 7px; background: transparent; color: var(--game-color); font-size: 16px; font-weight: 800; cursor: pointer; }
 .draw-navigation button:hover:not(:disabled) { background: color-mix(in srgb,var(--game-color) 10%,#fff); }
