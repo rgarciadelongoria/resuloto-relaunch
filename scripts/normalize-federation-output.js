@@ -22,5 +22,13 @@ for (const file of ['importmap.json', 'remoteEntry.json']) {
     }
     return typeof value === 'string' && value.startsWith('_') ? value.slice(1) : value;
   };
-  fs.writeFileSync(filePath, `${JSON.stringify(normalize(json), null, 2)}\n`);
+  const normalized = normalize(json);
+  if (file === 'remoteEntry.json' && normalized.exposes?.[0]?.outFileName) {
+    const generatedRoute = normalized.exposes[0].outFileName;
+    const generatedPath = path.join(outputDir, generatedRoute);
+    const stableRoute = 'routes.js';
+    if (fs.existsSync(generatedPath)) fs.copyFileSync(generatedPath, path.join(outputDir, stableRoute));
+    normalized.exposes = normalized.exposes.map(expose => ({ ...expose, outFileName: stableRoute }));
+  }
+  fs.writeFileSync(filePath, `${JSON.stringify(normalized, null, 2)}\n`);
 }
