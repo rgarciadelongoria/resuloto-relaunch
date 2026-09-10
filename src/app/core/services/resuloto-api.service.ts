@@ -1,6 +1,4 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
 import {
   AppConfig,
   CheckResult,
@@ -17,14 +15,12 @@ import {
  * Adaptador de la API pública existente. No interpreta la configuración HTML/XML
  * que la aplicación antigua ejecutaba: sólo transforma datos en modelos seguros.
  */
-// Se proporciona junto con HttpClient en el árbol de rutas del MF. La shell no
-// registra HttpClient en su inyector raíz.
-@Injectable()
+// No depende de HttpClient: la shell puede montar el remote con un inyector
+// aislado que no registre los providers de Angular HTTP.
+@Injectable({ providedIn: 'root' })
 export class ResulotoApiService {
   private readonly rootUrl = 'https://www.resuloto.com/';
   private readonly appUrl = 'https://www.resuloto.com/v1.0.7/';
-
-  constructor(private readonly http: HttpClient) {}
 
   async loadConfig(): Promise<AppConfig> {
     const url = new URL('json/getJson.php', this.appUrl);
@@ -135,11 +131,15 @@ export class ResulotoApiService {
   }
 
   private async getJson<T>(url: string): Promise<T> {
-    return firstValueFrom(this.http.get<T>(url));
+    const response = await fetch(url, { headers: { Accept: 'application/json' } });
+    if (!response.ok) throw new Error(`La fuente ha respondido con ${response.status}.`);
+    return response.json() as Promise<T>;
   }
 
   private async getText(url: string): Promise<string> {
-    return firstValueFrom(this.http.get(url, { responseType: 'text' }));
+    const response = await fetch(url, { headers: { Accept: 'application/xml, text/plain, */*' } });
+    if (!response.ok) throw new Error(`La fuente ha respondido con ${response.status}.`);
+    return response.text();
   }
 
   private parseDraws(xml: string): LotteryDraw[] {
