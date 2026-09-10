@@ -113,6 +113,7 @@ export class LottoDashboardComponent implements OnInit {
     'Triplex de la ONCE': '#f28c28', 'Mi Día': '#6e368c', 'Mi día de la ONCE': '#6e368c',
     EuroJackPot: '#e30613', Eurojackpot: '#e30613'
   };
+  private readonly remoteAssetBase = 'https://rgarciadelongoria.github.io/resuloto-relaunch/';
 
   constructor(
     readonly shell: ShellBridgeService,
@@ -623,7 +624,10 @@ export class LottoDashboardComponent implements OnInit {
 
   gameLogoUrl(game: LotteryGame, title = false): string | undefined {
     const localName = this.countryLogoNames[this.country?.code ?? '']?.[game.nombre];
-    if (localName) return `assets/logos/games/${(this.country?.code ?? 'ES').toLowerCase()}/${localName}${title ? '-title' : ''}.svg`;
+    if (localName) {
+      const path = `assets/logos/games/${(this.country?.code ?? 'ES').toLowerCase()}/${localName}${title ? '-title' : ''}.svg`;
+      return new URL(path, this.remoteAssetBase).toString();
+    }
     return this.gameIconUrl(game);
   }
 

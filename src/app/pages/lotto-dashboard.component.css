@@ -97,6 +97,7 @@
 
 /* Sistema visual mobile-first: zonas táctiles amplias, números legibles y logos propios. */
 :host { --ink: #15213b; --muted: #6e7890; --line: #e5e9f2; --paper: #fff; --soft: #f6f8fc; --purple: #7059e8; --navy: #121a35; }
+:host, :host button, :host input, :host select { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif; }
 .app-shell { overflow: clip; background: radial-gradient(circle at 100% -10%, rgba(112, 89, 232, .14), transparent 24rem), #f6f8fc; }
 .topbar { height: calc(64px + env(safe-area-inset-top)); padding: env(safe-area-inset-top) 16px 0; background: rgba(255,255,255,.9); }
 .brand { font-size: 19px; }.country-button { min-height: 40px; padding: 7px 8px; }.icon-button { width: 40px; height: 40px; border-radius: 13px; }
@@ -139,4 +140,8 @@ button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focu
 .history-loading { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 18px; color: #7c879b; font-size: 11px; }
 .loading-dot { width: 10px; height: 10px; border: 2px solid #ded9fb; border-top-color: var(--purple); border-radius: 50%; animation: spin .8s linear infinite; }
 .history-sentinel { height: 1px; }
+/* Reserva el espacio del banner AdMob nativo cuando la shell está en WebView. */
+:host-context(.plt-capacitor), :host-context(.capacitor) { --native-ad-height: 56px; }
+.page { padding-bottom: calc(108px + var(--native-ad-height, 0px)); }
+.bottom-nav { bottom: var(--native-ad-height, 0px); }
 @keyframes spin { to { transform: rotate(360deg); } }
