@@ -29,7 +29,10 @@ La versión de Angular y Native Federation coincide con `resuloto-shell`.
 ```console
 npm start
 npm run build
+npm run build:pages
 ```
+
+Cada push a `main` publica automáticamente una versión estática en [GitHub Pages](https://rgarciadelongoria.github.io/resuloto-relaunch/).
 
 El build genera [`remoteEntry.json`](./dist/resuloto-app/remoteEntry.json) y expone `./routes`. Para conectarlo a la shell, publica el contenido de `dist/resuloto-app` y actualiza el manifiesto de la shell:
 

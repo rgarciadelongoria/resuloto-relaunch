@@ -14,7 +14,8 @@
           "options": {},
           "configurations": {
             "production": { "target": "resuloto-app:esbuild:production" },
-            "development": { "target": "resuloto-app:esbuild:development", "dev": true }
+            "development": { "target": "resuloto-app:esbuild:development", "dev": true },
+            "pages": { "target": "resuloto-app:esbuild:pages" }
           },
           "defaultConfiguration": "production"
         },
@@ -44,6 +45,13 @@
               "sourceMap": false,
               "outputHashing": "all",
               "extractLicenses": true
+            },
+            "pages": {
+              "optimization": true,
+              "sourceMap": false,
+              "outputHashing": "all",
+              "extractLicenses": true,
+              "baseHref": "/resuloto-relaunch/"
             },
             "development": {
               "optimization": false,
