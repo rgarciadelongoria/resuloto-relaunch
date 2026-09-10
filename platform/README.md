@@ -13,7 +13,7 @@ La aplicación ResuLoto usa datos del servicio público `www2.resuloto.com`; cua
 
 ## Requisitos
 
-- Node.js 20.19+ (se recomienda Node 24).
+- Node.js 20.19+; para Native Federation se recomienda Node 22 LTS. En algunos entornos Node 24 puede bloquear el proceso esbuild del adaptador actual.
 - Xcode para iOS y Android Studio para Android.
 
 ## Desarrollo web
