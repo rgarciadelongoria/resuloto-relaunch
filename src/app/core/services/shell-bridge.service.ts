@@ -21,6 +21,7 @@ export class ShellBridgeService {
 
   applyChrome(): void {
     if (!this.isNative) return;
+    document.documentElement.classList.add('resuloto-native');
     this.dispatch('shellStatusbarSetStyle', { style: 'DARK' });
     this.dispatch('shellStatusbarSetBackgroundColor', { color: '#0b162e' });
   }
@@ -45,6 +46,7 @@ export class ShellBridgeService {
     }
 
     document.body.classList.add('barcode-scanner-active');
+    await this.hideBanner();
     document.documentElement.classList.add('barcode-scanner-active');
     document.documentElement.style.background = 'transparent';
     document.body.style.background = 'transparent';
@@ -79,8 +81,17 @@ export class ShellBridgeService {
     root?.style.removeProperty('pointer-events');
     this.scannerCancel?.remove();
     this.scannerCancel = undefined;
+    await this.resumeBanner();
     if (!this.isNative) return;
     try { await this.request('shellScannerStop', {}, undefined, 5_000); } catch { /* ya estaba cerrado */ }
+  }
+
+  async hideBanner(): Promise<void> {
+    if (this.isNative) { try { await this.request('shellAdmobHideBanner', {}, undefined, 5_000); } catch {} }
+  }
+
+  async resumeBanner(): Promise<void> {
+    if (this.isNative) { try { await this.request('shellAdmobResumeBanner', {}, undefined, 5_000); } catch {} }
   }
 
   async openExternal(url: string): Promise<void> {

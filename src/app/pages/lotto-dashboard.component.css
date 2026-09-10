@@ -222,3 +222,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focu
 :host(.scanner-host-hidden) { visibility: hidden !important; pointer-events: none !important; }
 :host(.scanner-host-hidden) .scanner-overlay { visibility: visible; pointer-events: auto; }
 :host-context(.plt-mobile) { --native-ad-height: 72px; }
+:host-context(.resuloto-native) { --native-ad-height: 100px; }
+:host-context(.resuloto-native) .topbar { height: 51px; padding-top: 0; }
+:host-context(.resuloto-native) .page { padding-top: 14px; padding-bottom: calc(100px + var(--native-ad-height)); }
+:host-context(.resuloto-native) .bottom-nav { bottom: 100px; }
