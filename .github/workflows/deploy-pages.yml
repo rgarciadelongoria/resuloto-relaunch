@@ -33,6 +33,9 @@ jobs:
       - name: Compilar la aplicación
         run: npm run build:pages
 
+      - name: Normalizar nombres del runtime federado
+        run: npm run normalize:federation
+
       - name: Evitar el filtrado de módulos de Native Federation
         run: touch dist/resuloto-app/.nojekyll
 
